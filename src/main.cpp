@@ -32,7 +32,7 @@ OV7670 camera (
         p28,p27,       // SDA(SIOD),SCL(SIOC)
         p12,p11,p10,   // VSYNC,HREF,WEN(FIFO)
         p24,p15,p25,p16,p26,p17,p29,p18, // D7-D0
-        p20,p30,p19) ; // RRST,OE,RCLK
+        p20,p30,p19,p23); // RRST,OE,RCLK,WRST
 
 //LocalFileSystem local("local");
 SDFileSystem sd(p5, p6, p7, p8, "sd"); //mosi, miso, sclk, cs, mount point
@@ -210,7 +210,7 @@ int main()
     }
     pc.printf("select %c\r\n", screen_size);
 
-    camera.InitForFIFOWriteReset();
+//    camera.InitForFIFOWriteReset();
     camera.InitDefaultReg();
 
 #ifdef COLOR_BAR
@@ -265,6 +265,7 @@ int main()
         }
 #endif
 
+        camera.InitForFIFOWriteReset();
         camera.CaptureNext();
         while(camera.CaptureDone() == false);
         camera.ReadStart();

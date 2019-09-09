@@ -16,7 +16,7 @@ public:
 
     I2C camera;
     InterruptIn vsync,href;
-    DigitalOut wen;
+    DigitalOut writeReset, wen;
     BusIn data;
     DigitalOut rrst,oe,rclk;
     volatile int LineCounter;
@@ -41,8 +41,9 @@ public:
             PinName d0, // D0
             PinName rt, // /RRST
             PinName o,  // /OE
-            PinName rc  // RCLK
-    ) : camera(sda,scl), vsync(vs), href(hr), wen(we), data(d0,d1,d2,d3,d4,d5,d6,d7), rrst(rt), oe(o), rclk(rc)
+            PinName rc,  // RCLK
+            PinName wrst  // WRST
+    ) : camera(sda,scl), vsync(vs), href(hr), wen(we), data(d0,d1,d2,d3,d4,d5,d6,d7), rrst(rt), oe(o), rclk(rc), writeReset(wrst)
     {
         camera.stop();
         camera.frequency(OV7670_I2CFREQ);
@@ -56,6 +57,7 @@ public:
         oe = 1;
         rclk = 1;
         wen = 0;
+        writeReset = 1;
     }
 
     // capture request
@@ -134,7 +136,10 @@ public:
     }
 
     void InitForFIFOWriteReset(void) {
-        WriteReg(REG_COM10, COM10_VS_NEG);
+//        WriteReg(REG_COM10, COM10_VS_NEG);
+        writeReset = 0;
+        wait_us(1);
+        writeReset = 1;
     }
 
     void InitSetColorbar(void)  {
